@@ -22,6 +22,7 @@
         <lombok.version>1.14.8</lombok.version>
         <log4jdbc.log4j2.version>1.16</log4jdbc.log4j2.version>
         <rest.assured.version>2.3.3</rest.assured.version>
+		<spring-boot-release>1.2.7.RELEASE</spring-boot-release>
     </properties>
 
     <dependencies>
@@ -54,6 +55,25 @@
                     </dependency>
                 </dependencies>
             </plugin>
+			
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring-loaded.version}</version>
+				<configuration>
+					<mainClass>com.work.mathserv.App</mainClass>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			
+			
         </plugins>
     </build>
 
