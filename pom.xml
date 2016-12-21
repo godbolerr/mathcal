@@ -23,6 +23,8 @@
         <log4jdbc.log4j2.version>1.16</log4jdbc.log4j2.version>
         <rest.assured.version>2.3.3</rest.assured.version>
 		<spring-boot-release>1.2.7.RELEASE</spring-boot-release>
+		<mysql.connector-version>5.1.21</mysql.connector-version>
+		<hikaricp-version>2.2.5</hikaricp-version>		
     </properties>
 
     <dependencies>
@@ -41,6 +43,28 @@
             <version>${rest.assured.version}</version>
             <scope>test</scope>
         </dependency>
+        
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+        
+        		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>${mysql.connector-version}</version>
+		</dependency>
+        
+ 		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<version>${hikaricp-version}</version>
+		</dependency>       
+        
+        
+        
+        
+        
     </dependencies>
     <build>
         <plugins>
