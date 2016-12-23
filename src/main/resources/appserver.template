@@ -1,4 +1,5 @@
 {
+    "AWSTemplateFormatVersion": "2010-09-09", 
     "Mappings": {
         "RegionMap": {
             "ap-northeast-1": {
@@ -69,7 +70,7 @@
         },
 		
       "URL": {
-            "Description": "URL of the deployed aplication",
+            "Description": "URL of the deployed application",
             "Value": {
                 "Fn::Join": [
                     "",
@@ -81,6 +82,7 @@
                                 "DNSName"
                             ]
                         },
+                        ":",
 						{
 							"Ref": "LBPort"
 						
@@ -134,6 +136,16 @@
 		"Default": "vpc-8b48f1ef",
 		"Type": "String"
 	},	
+	
+	"DBHost": {
+		"Type": "String"
+	},	
+	
+	"DBPort": {
+		"Default": "3306",
+		"Type": "String"
+	},
+	
 	
 	"subnetA": {
 		"Default": "subnet-7b24a11f",
@@ -222,7 +234,7 @@
                 },
                 "Name": "WebTarget",
                 "Port": {
-                    "Ref": "Port"
+                    "Ref": "LBPort"
                 },
                 "Protocol": "HTTP",
                 "Targets": [
@@ -364,10 +376,15 @@
 					"cd /var/www/appx \n",
 					"export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.111-1.b15.25.amzn1.x86_64 \n",
 					"export PATH=JAVA_HOME/bin:$PATH \n",
-					"mvn package \n",
+					"mvn " , " -Ddb.url=jdbc:mysql://",	{ "Ref" : "DBHost" }, ":" ,  { "Ref" : "DBPort" } , "/newdb" , " package \n",
 					"cd /var/www/appx/target \n",
-					"/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.111-1.b15.25.amzn1.x86_64/bin/java -Dserver.port=",  { "Ref" : "Port1" }  ," -jar mathcal-1.0-SNAPSHOT.jar  & \n",
-					"/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.111-1.b15.25.amzn1.x86_64/bin/java -Dserver.port=",  { "Ref" : "Port2" }  ," -jar mathcal-1.0-SNAPSHOT.jar  & \n"
+					"/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.111-1.b15.25.amzn1.x86_64/bin/java -Dserver.port=",  { "Ref" : "Port1" } , 
+					" -Ddb.url=jdbc:mysql://",	{ "Ref" : "DBHost" }, ":" ,  { "Ref" : "DBPort" } , "/newdb"
+					," -jar mathcal-1.0-SNAPSHOT.jar  & \n",
+					"/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.111-1.b15.25.amzn1.x86_64/bin/java -Dserver.port=",  { "Ref" : "Port2" } , 					
+					" -Ddb.url=jdbc:mysql://",	{ "Ref" : "DBHost" }, ":" ,  { "Ref" : "DBPort" } , "/newdb"
+					," -jar mathcal-1.0-SNAPSHOT.jar  & \n"
+
 					
 				]]}}
 				
