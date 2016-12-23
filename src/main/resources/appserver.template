@@ -67,6 +67,32 @@
                 ]
             }
         },
+		
+      "URL": {
+            "Description": "URL of the deployed aplication",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "http://",
+                        {
+                            "Fn::GetAtt": [
+                                "ApplicationElasticLB",
+                                "DNSName"
+                            ]
+                        },
+						{
+							"Ref": "LBPort"
+						
+						},
+						
+						"/calc?left=339&right=94949"
+                    ]
+                ]
+            }
+        }		,
+		
+		
         "PublicIP": {
             "Description": "Public IP address of the newly created EC2 instance",
             "Value": {
@@ -85,6 +111,12 @@
 			"Type": "String"
         },
 		
+    "LBPort" : {
+        "Description" : "Port number for the load balancer ",
+        "Type" : "Number",
+        "Default" : "20000"
+    },		
+		
 
     "Port1" : {
         "Description" : "Port number for 1st instance of appx server ",
@@ -96,7 +128,22 @@
         "Description" : "Port number for 2nd instance of appx server ",
         "Type" : "Number",
         "Default" : "20002"
-    }
+    },
+	
+	"VpcId": {
+		"Default": "vpc-8b48f1ef",
+		"Type": "String"
+	},	
+	
+	"subnetA": {
+		"Default": "subnet-7b24a11f",
+		"Type": "String"
+	},
+	
+	"subnetB": {
+		"Default": "subnet-c829f6be",
+		"Type": "String"
+	}	
 
 
 		
@@ -128,6 +175,82 @@
 		      }
 		    },
 			
+			
+       "ApplicationElasticLB": {
+            "Properties": {
+                "Name": "ApplicationElasticLB",
+                "Scheme": "internet-facing",
+                "Subnets": [
+                    {
+                        "Ref": "subnetA"
+                    },
+                    {
+                        "Ref": "subnetB"
+                    }
+                ]
+            },
+            "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer"
+        },		
+		
+        "Listener": {
+            "Properties": {
+                "DefaultActions": [
+                    {
+                        "TargetGroupArn": {
+                            "Ref": "TargetGroupWeb"
+                        },
+                        "Type": "forward"
+                    }
+                ],
+                "LoadBalancerArn": {
+                    "Ref": "ApplicationElasticLB"
+                },
+                "Port": { "Ref": "LBPort" },
+                "Protocol": "HTTP"
+            },
+            "Type": "AWS::ElasticLoadBalancingV2::Listener"
+        },
+
+        "TargetGroupWeb": {
+            "Properties": {
+                "HealthCheckIntervalSeconds": "30",
+                "HealthCheckProtocol": "HTTP",
+                "HealthCheckTimeoutSeconds": "10",
+                "HealthyThresholdCount": "4",
+                "Matcher": {
+                    "HttpCode": "200"
+                },
+                "Name": "WebTarget",
+                "Port": {
+                    "Ref": "Port"
+                },
+                "Protocol": "HTTP",
+                "Targets": [
+                    {
+                        "Id": {
+                            "Ref": "WebServer"
+                        },
+                        "Port": {
+                            "Ref": "Port1"
+                        }
+                    },
+                    {
+                        "Id": {
+                            "Ref": "WebServer"
+                        },
+                        "Port": {
+                            "Ref": "Port2"
+                        }
+                    }					
+                ],
+                "UnhealthyThresholdCount": "3",
+                "VpcId": {
+                    "Ref": "VpcId"
+                }
+            },
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup"
+        },		
+			
        "InstanceSecurityGroup": {
             "Properties": {
                 "GroupDescription": "Enable SSH and HTTP access on the defined port",
@@ -148,6 +271,18 @@
                             "Ref": "Port1"
                         }
                     },
+                    {
+                        "CidrIp": "0.0.0.0/0",
+                        "FromPort": {
+                            "Ref": "LBPort"
+                        },
+                        "IpProtocol": "tcp",
+                        "ToPort": {
+                            "Ref": "LBPort"
+                        }
+                    },
+					
+					
                     {
                         "CidrIp": "0.0.0.0/0",
                         "FromPort": {

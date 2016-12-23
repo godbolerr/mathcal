@@ -1,0 +1,41 @@
+{
+    "AWSTemplateFormatVersion" : "2010-09-09",
+    "Resources" : {
+        "appvpc" : {
+	       "Type" : "AWS::CloudFormation::Stack",
+	       "Properties" : {
+	          "TemplateURL" : "https://s3-us-west-2.amazonaws.com/godbolerr-cloudformation/appvpc.template",
+              "TimeoutInMinutes" : "60",
+	           "Parameters" : {
+	               "Project" : "Appx Works"
+	           }              
+              
+	       }
+        },
+        
+         "webInstance" : {
+	       "Type" : "AWS::CloudFormation::Stack",
+	       "Properties" : {
+	          "TemplateURL" : "https://s3-us-west-2.amazonaws.com/godbolerr-cloudformation/appserver.template",
+              "TimeoutInMinutes" : "60",
+	           "Parameters" : {
+	               "InstanceType" : "t1.micro",
+	               "KeyName" : "RSG_KEY",
+	               "Project" : "Appx Works",
+	               "VpcId" : { "Fn::GetAtt" : [ "appvpc", "Outputs.VPC" ] },
+	               "subnetA" :{ "Fn::GetAtt" : [ "appvpc", "Outputs.PublicSubnet1" ] },
+	               "subnetB" :{ "Fn::GetAtt" : [ "appvpc", "Outputs.PublicSubnet2" ] }
+	           }              
+              
+	       }
+        }
+        
+        
+    },
+    "Outputs": {
+       "StackRef": {"Value": { "Ref" : "appvpc"}},
+       "OutputFromNestedStack" : {
+             "Value" : { "Fn::GetAtt" : [ "appvpc", "Outputs.VPC" ] }
+       }
+    }
+}
