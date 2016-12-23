@@ -1,13 +1,15 @@
 {
     "AWSTemplateFormatVersion" : "2010-09-09",
     "Resources" : {
-        "appvpc" : {
+        "apprdsmysql" : {
 	       "Type" : "AWS::CloudFormation::Stack",
 	       "Properties" : {
-	          "TemplateURL" : "https://s3-us-west-2.amazonaws.com/godbolerr-cloudformation/appvpc.template",
+	          "TemplateURL" : "https://s3-us-west-2.amazonaws.com/godbolerr-cloudformation/rds_mysql.template",
               "TimeoutInMinutes" : "60",
 	           "Parameters" : {
-	               "Project" : "Appx Works"
+	               "DBPassword" : "password",
+	               "DBName":"newdb",
+	               "DBUser":"admin"
 	           }              
               
 	       }
@@ -19,12 +21,9 @@
 	          "TemplateURL" : "https://s3-us-west-2.amazonaws.com/godbolerr-cloudformation/appserver.template",
               "TimeoutInMinutes" : "60",
 	           "Parameters" : {
-	               "InstanceType" : "t1.micro",
-	               "KeyName" : "RSG_KEY",
-	               "Project" : "Appx Works",
-	               "VpcId" : { "Fn::GetAtt" : [ "appvpc", "Outputs.VPC" ] },
-	               "subnetA" :{ "Fn::GetAtt" : [ "appvpc", "Outputs.PublicSubnet1" ] },
-	               "subnetB" :{ "Fn::GetAtt" : [ "appvpc", "Outputs.PublicSubnet2" ] }
+	      
+	               "DBHost" : { "Fn::GetAtt" : [ "apprdsmysql", "Outputs.DBHost" ] },
+	               "DBPort" :{ "Fn::GetAtt" : [ "apprdsmysql", "Outputs.DBPort" ] }
 	           }              
               
 	       }
@@ -33,9 +32,8 @@
         
     },
     "Outputs": {
-       "StackRef": {"Value": { "Ref" : "appvpc"}},
        "OutputFromNestedStack" : {
-             "Value" : { "Fn::GetAtt" : [ "appvpc", "Outputs.VPC" ] }
+             "Value" : { "Fn::GetAtt" : [ "webInstance", "Outputs.URL" ] }
        }
     }
 }
